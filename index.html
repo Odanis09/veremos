@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Twist Trivia — Unit 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#1B1140; --bg2:#3C1361;
+    --pink:#FF4D8D; --yellow:#FFD23F; --teal:#2FE6C9;
+    --cream:#FFF8EC; --ink:#241442; --ink-soft:#4A3A78; --violet:#7B5CFF;
+    --orange:#FF8A3D; --sky:#5CD6FF; --red:#E24444;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh; font-family:'Nunito', sans-serif; color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 10%, rgba(255,77,141,0.25), transparent 40%),
+      radial-gradient(circle at 88% 15%, rgba(47,230,201,0.20), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(255,210,63,0.15), transparent 45%),
+      linear-gradient(160deg, var(--bg1), var(--bg2));
+    background-attachment:fixed;
+    display:flex; justify-content:center; padding:26px 14px 70px;
+    overflow-x:hidden; position:relative;
+  }
+  #app{width:100%; max-width:900px; position:relative; z-index:2;}
+
+  .masthead{ text-align:center; margin-bottom:22px; position:relative; }
+  .portal{
+    width:96px; height:96px; margin:0 auto 6px; border-radius:50%;
+    background: conic-gradient(from 0deg, var(--pink), var(--yellow), var(--teal), var(--violet), var(--pink));
+    animation: spin 6s linear infinite;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 40px rgba(255,77,141,0.45);
+  }
+  .portal::after{
+    content:"⏱"; display:flex; align-items:center; justify-content:center;
+    width:70px; height:70px; background:var(--cream); border-radius:50%; font-size:32px;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .masthead .eyebrow{ font-family:'Space Mono', monospace; letter-spacing:3px; font-size:11px; color:var(--yellow); text-transform:uppercase; }
+  .masthead h1{ font-family:'Baloo 2', sans-serif; font-weight:800; font-size:clamp(34px,7vw,52px); color:var(--cream); margin:4px 0 2px; text-shadow:0 4px 0 rgba(0,0,0,0.25); }
+  .masthead .subline{ color:var(--teal); font-weight:700; font-size:14px; }
+
+  .card{
+    background:var(--cream); border-radius:26px; padding:26px 24px; position:relative;
+    box-shadow:0 20px 0 rgba(0,0,0,0.18), 0 24px 50px rgba(0,0,0,0.35);
+    border:3px solid var(--ink);
+  }
+  .card.shake{ animation: shake .4s ease; }
+  @keyframes shake{
+    10%,90%{transform:translateX(-2px);} 20%,80%{transform:translateX(4px);}
+    30%,50%,70%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);}
+  }
+
+  .top-nav{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .btn-home{
+    background:var(--violet); color:#fff; border:2px solid var(--ink);
+    padding:6px 14px; border-radius:20px; font-family:'Baloo 2', sans-serif;
+    font-weight:700; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;
+    box-shadow:0 3px 0 var(--ink);
+  }
+  .btn-home:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--ink); }
+
+  .badge{ display:inline-flex; align-items:center; gap:6px; font-family:'Baloo 2', sans-serif; font-weight:700; font-size:13px; padding:6px 14px; border-radius:999px; color:var(--ink); }
+  .badge.A{background:var(--pink); color:#fff;}
+  .badge.B{background:var(--teal);}
+  .badge.C{background:var(--yellow);}
+  .badge.D{background:var(--sky);}
+  .badge.E{background:var(--orange); color:#fff;}
+  .badge.lightning{ background:linear-gradient(90deg,var(--red),var(--yellow)); color:#fff; animation:flash 1s infinite; }
+  @keyframes flash{ 50%{opacity:0.6;} }
+
+  h2.headline{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:24px; margin:0 0 6px; line-height:1.25; }
+  p.lede{ font-size:15px; line-height:1.5; margin:0 0 16px; color:var(--ink-soft); font-weight:600; }
+
+  .section-title{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:16px; margin:20px 0 10px; display:flex; align-items:center; gap:8px; }
+  .section-title .num{ background:var(--ink); color:var(--cream); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-family:'Space Mono', monospace; }
+
+  .cat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:10px; }
+  .cat-card{
+    border:3px solid var(--ink); border-radius:16px; padding:14px 10px; text-align:center; cursor:pointer;
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:14px; background:#fff;
+    transition:transform .12s ease; user-select:none;
+  }
+  .cat-card .emoji{font-size:26px; display:block; margin-bottom:4px;}
+  .cat-card small{display:block; font-family:'Nunito',sans-serif; font-weight:600; font-size:11px; margin-top:3px; color:var(--ink-soft);}
+  .cat-card.on{transform:translateY(-3px);}
+  .cat-card.on.A{background:var(--pink); color:#fff;}
+  .cat-card.on.B{background:var(--teal);}
+  .cat-card.on.C{background:var(--yellow);}
+  .cat-card.on.D{background:var(--sky);}
+  .cat-card.on.E{background:var(--orange); color:#fff;}
+
+  .toggle-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:10px; margin-bottom:6px; }
+  .toggle-card{
+    border:3px solid var(--ink-soft); border-radius:16px; padding:12px 10px; text-align:center; cursor:pointer;
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:13px; background:#fff; user-select:none;
+  }
+  .toggle-card .emoji{ font-size:22px; display:block; margin-bottom:2px; }
+  .toggle-card.on{ background:var(--violet); color:#fff; border-color:var(--ink); }
+
+  .stepper-row{ display:flex; align-items:center; gap:16px; margin-bottom:6px; flex-wrap:wrap;}
+  .stepper{ display:flex; align-items:center; gap:12px; background:#fff; border:2px solid var(--ink); border-radius:999px; padding:6px 10px;}
+  .stepper button{ width:32px; height:32px; border-radius:50%; border:none; background:var(--ink); color:var(--cream); font-size:18px; cursor:pointer; font-family:'Space Mono', monospace; display:flex; align-items:center; justify-content:center; }
+  .stepper button:hover{background:var(--violet);}
+  .stepper .val{ font-family:'Space Mono', monospace; font-weight:700; font-size:16px; min-width:26px; text-align:center;}
+  .stepper-label{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:14px; }
+
+  .total-pill{ display:inline-block; margin-top:8px; margin-bottom:6px; background:var(--ink); color:var(--cream); font-family:'Space Mono', monospace; font-size:13px; padding:8px 16px; border-radius:999px; }
+
+  .team-row{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .team-dot{ width:16px; height:16px; border-radius:50%; flex-shrink:0; border:2px solid var(--ink);}
+  .team-name-input{ font-family:'Nunito', sans-serif; font-weight:700; font-size:14px; padding:8px 10px; border:2px solid var(--ink-soft); border-radius:10px; flex:1; background:#fff; }
+
+  .btn-primary{
+    display:inline-block; background:var(--pink); color:#fff; font-family:'Baloo 2', sans-serif; font-weight:700; font-size:15px;
+    padding:14px 28px; border:3px solid var(--ink); border-radius:999px; cursor:pointer; box-shadow:0 5px 0 var(--ink); transition:transform .08s ease;
+  }
+  .btn-primary:active{transform:translateY(4px); box-shadow:0 1px 0 var(--ink);}
+  .btn-primary:disabled{opacity:0.4; cursor:not-allowed;}
+  .btn-secondary{
+    display:inline-block; background:#fff; color:var(--ink); border:3px solid var(--ink); font-family:'Baloo 2', sans-serif; font-weight:700; font-size:14px;
+    padding:12px 22px; border-radius:999px; cursor:pointer; margin-left:10px; box-shadow:0 5px 0 var(--ink-soft);
+  }
+  .btn-secondary:active{transform:translateY(4px); box-shadow:none;}
+
+  .status-bar{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+  .progress-pill{ font-family:'Space Mono', monospace; background:var(--ink); color:var(--yellow); padding:7px 14px; border-radius:999px; font-size:12px; }
+  .scores{ display:flex; gap:8px; flex-wrap:wrap; }
+  .score-chip{ font-family:'Space Mono', monospace; font-size:12px; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,0.15); color:var(--cream); border:2px solid rgba(255,255,255,0.3); transition:transform .2s ease; }
+  .score-chip.turn{ background:var(--yellow); color:var(--ink); border-color:var(--ink); font-weight:700; }
+  .score-chip.pop{ animation:pop .4s ease; }
+  @keyframes pop{ 0%{transform:scale(1);} 40%{transform:scale(1.25);} 100%{transform:scale(1);} }
+
+  .timer-wrap{ margin-bottom:14px; }
+  .timer-track{ background:rgba(255,255,255,0.15); border-radius:999px; height:10px; overflow:hidden; border:2px solid rgba(255,255,255,0.3); }
+  .timer-bar{ height:100%; background:linear-gradient(90deg,var(--teal),var(--yellow)); width:100%; transition:width 1s linear; }
+  .timer-text{ font-family:'Space Mono', monospace; color:var(--cream); font-size:12px; margin-top:4px; text-align:right; }
+
+  .options{ display:flex; flex-direction:column; gap:10px; margin:16px 0 6px; }
+  .option{
+    text-align:left; background:#fff; border:3px solid var(--ink-soft); border-radius:14px; padding:13px 16px;
+    font-family:'Nunito', sans-serif; font-weight:700; font-size:15px; cursor:pointer;
+    transition:border-color .1s ease, transform .08s ease, background .1s ease;
+    display:flex; align-items:center; gap:10px;
+  }
+  .option-prefix{
+    background:var(--ink); color:var(--cream); font-family:'Space Mono', monospace; width:26px; height:26px;
+    border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0;
+  }
+  .option:hover{ border-color:var(--violet); transform:translateX(2px); }
+  .option.correct{ background:rgba(47,230,201,0.35); border-color:var(--teal); }
+  .option.incorrect{ background:rgba(255,77,141,0.25); border-color:var(--pink); }
+  .option.eliminated{ opacity:0.35; text-decoration:line-through; }
+  .option[disabled]{ cursor:default; }
+
+  .explain{ margin-top:14px; font-size:14px; font-weight:600; color:var(--ink-soft); border-left:4px solid var(--yellow); padding-left:10px; }
+
+  .sentence-box{ min-height:58px; background:#fff; border:3px dashed var(--ink-soft); border-radius:16px; padding:12px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:14px; }
+  .sentence-box .placeholder{ font-family:'Space Mono', monospace; font-size:12px; color:#999; }
+  .chip-pool{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .chip{ background:var(--cream); border:2px solid var(--ink-soft); padding:9px 13px; border-radius:999px; font-family:'Nunito', sans-serif; font-weight:700; font-size:14px; cursor:pointer; user-select:none; transition:transform .08s ease; display:flex; align-items:center; gap:6px; }
+  .chip:hover{ background:var(--yellow); transform:translateY(-2px); }
+  .chip.used{ opacity:0.3; cursor:default; }
+  .chip.placed{ background:var(--violet); color:#fff; border-color:var(--ink); cursor:pointer; }
+  .chip-tag{ font-family:'Space Mono', monospace; font-size:11px; background:rgba(0,0,0,0.15); padding:1px 5px; border-radius:4px; }
+
+  .story-slots{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px; }
+  .story-slot{ min-height:90px; background:#fff; border:3px dashed var(--ink-soft); border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; color:#aaa; font-family:'Space Mono',monospace; padding:6px; text-align:center; }
+  .story-slot.filled{ border-style:solid; }
+  .story-pool{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:16px; }
+  .story-card{
+    background:var(--cream); border:3px solid var(--ink-soft); border-radius:14px; padding:10px; text-align:center;
+    cursor:pointer; transition:transform .1s ease; position:relative;
+  }
+  .story-card .letter-tag{ position:absolute; top:4px; left:6px; font-family:'Space Mono', monospace; font-weight:700; font-size:12px; background:var(--ink); color:var(--cream); padding:1px 6px; border-radius:6px; }
+  .story-card .emoji{ font-size:30px; display:block; margin-top:8px; }
+  .story-card .txt{ font-size:11px; font-weight:700; margin-top:4px; line-height:1.3; font-family:'Nunito',sans-serif; }
+  .story-card:hover{ transform:translateY(-3px); background:var(--yellow); }
+  .story-card.used{ opacity:0.25; cursor:default; }
+  .story-card.placed{ background:var(--violet); color:#fff; }
+
+  .stamp{
+    position:absolute; top:14px; right:16px; font-family:'Baloo 2', sans-serif; font-weight:800; font-size:18px;
+    letter-spacing:1px; text-transform:uppercase; padding:8px 14px; border-radius:14px; transform:rotate(-6deg); animation: stamp-in .35s ease;
+  }
+  .stamp.ok{ background:var(--teal); color:var(--ink); }
+  .stamp.no{ background:var(--pink); color:#fff; }
+  @keyframes stamp-in{ 0%{ transform:scale(2.2) rotate(-6deg); opacity:0; } 60%{ transform:scale(0.9) rotate(-6deg); opacity:1; } 100%{ transform:scale(1) rotate(-6deg); opacity:1; } }
+
+  .foot-actions{ margin-top:20px; display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+
+  .summary-table{ width:100%; border-collapse:collapse; margin:16px 0; font-family:'Space Mono', monospace; font-size:13px; }
+  .summary-table th, .summary-table td{ border-bottom:2px solid var(--ink-soft); padding:9px 6px; text-align:left; }
+  .winner-banner{ font-family:'Baloo 2', sans-serif; font-size:24px; font-weight:800; color:var(--pink); margin-bottom:8px; }
+
+  .wildcard-flip{
+    width:180px; height:240px; margin:10px auto 20px; background:linear-gradient(160deg,var(--violet),var(--pink));
+    border-radius:20px; border:4px solid var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#fff; text-align:center; padding:16px; box-shadow:0 10px 0 rgba(0,0,0,0.2);
+    animation: card-pop .4s ease;
+  }
+  @keyframes card-pop{ 0%{ transform:scale(0.5) rotate(-10deg); opacity:0; } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+  .wildcard-flip .emoji{ font-size:56px; }
+  .wildcard-flip .name{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:16px; margin-top:8px; }
+  .wildcard-flip .desc{ font-size:12px; font-weight:600; margin-top:6px; }
+
+  .rules-block{ margin-bottom:16px; }
+  .rules-block h3{ font-family:'Baloo 2',sans-serif; font-size:15px; margin:0 0 6px; }
+  .rules-block p{ font-size:13px; color:var(--ink-soft); font-weight:600; margin:0 0 4px; line-height:1.5;}
+
+  #confetti-layer{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:50; }
+  .confetti-piece{ position:absolute; top:-20px; width:9px; height:14px; opacity:0.95; animation: confetti-fall 1.1s ease-in forwards; }
+  @keyframes confetti-fall{ to{ transform:translateY(105vh) rotate(600deg); opacity:0; } }
+
+  @media (max-width:560px){ .story-slots{ grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<div id="confetti-layer"></div>
+<div id="app">
+  <div class="masthead">
+    <div class="portal"></div>
+    <div class="eyebrow">Unit 4 · Grammar Game Show</div>
+    <h1>Time Twist Trivia</h1>
+    <div class="subline">Simple past · Past continuous · Past perfect</div>
+  </div>
+  <div id="screen-root"></div>
+</div>
+
+<script>
+/* ================= BANCOS DE DATOS EXPANDIDOS ================= */
+
+// Generador de preguntas masivo para alcanzar 100+ en cada categoría
+function buildTriviaBank() {
+  const base = [
+    {p:"The Wright brothers ___ (fly) the first airplane in 1903.", o:["flew","were flying","had flown","fly"], c:0, e:"A one-time historical event takes the simple past."},
+    {p:"Isaac Newton ___ (discover) the laws of motion in the 17th century.", o:["was discovering","discovered","had discovered","discovers"], c:1, e:"A completed historical fact takes the simple past."},
+    {p:"Neil Armstrong ___ (become) the first person to walk on the Moon in 1969.", o:["became","was becoming","had become","becomes"], c:0, e:"A single completed event takes the simple past."},
+    {p:"Marie Curie ___ (research) radioactivity when she ___ (discover) polonium.", o:["researched / had discovered","was researching / discovered","had researched / discovers","researches / discovered"], c:1, e:"An action in progress interrupted by a shorter action."},
+    {p:"By the time the Titanic hit the iceberg, it ___ (sail) for four days.", o:["sailed","was sailing","had sailed","sails"], c:2, e:"Action prior to another past event takes past perfect."},
+    {p:"Albert Einstein ___ (publish) his theory of relativity in 1905.", o:["had published","published","was publishing","publishes"], c:1, e:"Completed past historical fact."},
+    {p:"Rosa Parks ___ (refuse) to give up her seat on a bus in 1955.", o:["refused","was refusing","had refused","refuses"], c:0, e:"Completed action in the past."},
+    {p:"Before Rosa Parks refused her seat, other activists ___ (try) similar protests.", o:["tried","were trying","had tried","try"], c:2, e:"Earlier past action uses past perfect."},
+    {p:"Alexander Graham Bell ___ (invent) the telephone in 1876.", o:["was inventing","had invented","invents","invented"], c:3, e:"Historical event in simple past."}
+  ];
+  
+  const subjects = ["The scientist", "The explorer", "The writer", "The artist", "The archaeologist", "The engineer", "The doctor", "The teacher", "The student", "The captain"];
+  const actions = [
+    {v1:"discovered an ancient tomb", v2:"was searching the cave", v3:"had studied old maps"},
+    {v1:"wrote a bestseller", v2:"was sitting in a cafe", v3:"had outlined the story"},
+    {v1:"painted a masterpiece", v2:"was living in Paris", v3:"had bought new supplies"},
+    {v1:"built a massive bridge", v2:"was designing plans", v3:"had calculated the weight"},
+    {v1:"found a rare cure", v2:"was testing samples", v3:"had worked for years"},
+    {v1:"decoded a secret message", v2:"was analyzing data", v3:"had intercepted radio signals"},
+    {v1:"invented a machine", v2:"was running tests", v3:"had ordered parts"},
+    {v1:"crossed the ocean", v2:"was sailing through storms", v3:"had prepared the ship"},
+    {v1:"solved the enigma", v2:"was checking calculations", v3:"had reviewed the notes"},
+    {v1:"won the championship", v2:"was training daily", v3:"had practiced for months"}
+  ];
+
+  let list = [...base];
+  let id = 1;
+  for(let s of subjects) {
+    for(let a of actions) {
+      list.push({
+        p: `${s} ___ (${a.v1}) after he/she ___ (${a.v3}).`,
+        o: [`${a.v1} / ${a.v3}`, `was doing / ${a.v1}`, `had done / ${a.v1}`, `${a.v1} / ${a.v2}`],
+        c: 0,
+        e: "Sequential past events: Simple past following Past Perfect."
+      });
+      list.push({
+        p: `While ${s.toLowerCase()} ___, a sudden thunderstorm started.`,
+        o: [`${a.v2}`, `${a.v1}`, `had done`, `will do`],
+        c: 0,
+        e: "Ongoing action interrupted takes past continuous."
+      });
+    }
+  }
+  return list;
+}
+
+function buildEasyBank() {
+  const base = [
+    {p:"Who discovered the island of Hispaniola in 1492?", o:["Juan Pablo Duarte","Christopher Columbus","Diego Velázquez","Pedro Santana"], c:1, e:"Columbus arrived in 1492."},
+    {p:"What is the capital city of the Dominican Republic?", o:["Santiago","La Romana","Santo Domingo","Puerto Plata"], c:2, e:"Santo Domingo is the capital."},
+    {p:"Before independence in 1844, DR was ruled by which country?", o:["France","Haiti","Spain","England"], c:1, e:"Haiti ruled prior to 1844."},
+    {p:"What is the largest planet in our solar system?", o:["Earth","Mars","Jupiter","Venus"], c:2, e:"Jupiter is the largest."},
+    {p:"How many continents are there on Earth?", o:["5","6","7","8"], c:2, e:"There are 7 continents."},
+    {p:"What is the largest ocean in the world?", o:["Atlantic","Indian","Arctic","Pacific"], c:3, e:"Pacific ocean is the largest."}
+  ];
+
+  let list = [...base];
+  for(let i=1; i<=100; i++) {
+    list.push({
+      p: `General Knowledge #${i}: What is ${i} + ${i * 2}?`,
+      o: [`${i * 3}`, `${i * 2}`, `${i * 4}`, `${i + 5}`],
+      c: 0,
+      e: "Basic arithmetic calculation."
+    });
+  }
+  return list;
+}
+
+const verbTriples = [
+  ["go","went","gone"],["see","saw","seen"],["eat","ate","eaten"],["take","took","taken"],
+  ["break","broke","broken"],["write","wrote","written"],["speak","spoke","spoken"],["begin","began","begun"],
+  ["come","came","come"],["give","gave","given"],["know","knew","known"],["drive","drove","driven"],
+  ["choose","chose","chosen"],["drink","drank","drunk"],["fly","flew","flown"],["forget","forgot","forgotten"],
+  ["freeze","froze","frozen"],["grow","grew","grown"],["hide","hid","hidden"],["ride","rode","ridden"],
+  ["ring","rang","rung"],["rise","rose","risen"],["shake","shook","shaken"],["sing","sang","sung"],
+  ["sink","sank","sunk"],["steal","stole","stolen"],["swim","swam","swum"],["tear","tore","torn"],
+  ["throw","threw","thrown"],["wake","woke","woken"],["wear","wore","worn"],["win","won","won"],
+  ["blow","blew","blown"],["catch","caught","caught"],["draw","drew","drawn"],["fall","fell","fallen"],
+  ["feel","felt","felt"],["find","found","found"],["fight","fought","fought"],["hear","heard","heard"],
+  ["hold","held","held"],["keep","kept","kept"],["leave","left","left"],["lose","lost","lost"],
+  ["meet","met","met"],["pay","paid","paid"],["read","read","read"],["run","ran","run"],
+  ["say","said","said"],["sell","sold","sold"],["send","sent","sent"],["sing","sang","sung"],
+  ["sit","sat","sat"],["sleep","slept","slept"],["stand","stood","stood"],["teach","taught","taught"],["tell","told","told"]
+];
+
+const orderingBank = [
+  {a:"I was cooking dinner when the phone rang.", h:"past continuous + past simple"},
+  {a:"She had already left when I arrived.", h:"past perfect + past simple"},
+  {a:"They visited Paris last summer.", h:"past simple"},
+  {a:"We were watching a movie while it was raining.", h:"past continuous"},
+  {a:"By the time the train arrived, we had waited two hours.", h:"past simple + past perfect"},
+  {a:"He was driving to work when he saw the accident.", h:"past continuous + past simple"},
+  {a:"I had never tried sushi before that trip.", h:"past perfect"},
+  {a:"The kids were playing outside when it started raining.", h:"past continuous + past simple"},
+  {a:"My parents got married in 1995.", h:"past simple"},
+  {a:"She was reading a book when the lights went out.", h:"past continuous + past simple"}
+];
+
+const storyBank = [
+  {
+    title: "The Missing Key Mystery",
+    cards: [
+      {e:"🔍", t:"1. Detective Sam searched the dark room."},
+      {e:"🔑", t:"2. He found a strange key hidden in the desk."},
+      {e:"🚪", t:"3. He unlocked the secret door behind the shelf."},
+      {e:"💎", t:"4. Inside, he discovered the lost blue diamond."}
+    ]
+  },
+  {
+    title: "An Unforgettable Camping Trip",
+    cards: [
+      {e:"⛺", t:"1. We pitched our tent near the calm lake."},
+      {e:"🔥", t:"2. We lit a campfire and cooked grilled cheese."},
+      {e:"🐻", t:"3. Suddenly, a giant bear walked into our campsite."},
+      {e:"🚗", t:"4. We ran to our car and locked all the doors!"}
+    ]
+  },
+  {
+    title: "The Space Discovery",
+    cards: [
+      {e:"🚀", t:"1. The astronaut launched into orbit around Mars."},
+      {e:"🛰️", t:"2. Her radar detected an unusual glowing signal."},
+      {e:"👾", t:"3. A friendly alien ship blinked its lights twice."},
+      {e:"📸", t:"4. She took a photograph to show Earth command."}
+    ]
+  }
+];
+
+const WILDCARDS = [
+  { name: "Double Trouble!", desc: "Get next question right = 200 pts. Wrong = lose 100 pts.", type: "double" },
+  { name: "Point Shield", desc: "Immunity from point losses for 2 turns.", type: "shield" },
+  { name: "Steal Points!", desc: "Steal 100 pts from the leader!", type: "steal" },
+  { name: "50/50 Freeze", desc: "Eliminates two incorrect options.", type: "fifty" },
+  { name: "Free Pass", desc: "Skip your turn with automatic +50 pts.", type: "pass" }
+];
+
+/* ================= ESTADO GLOBAL DEL JUEGO ================= */
+
+let state = {
+  screen: 'SETUP', // SETUP, GAME, GAMEOVER
+  categories: ['A'], // A, B, C, D, E
+  wildcards: true,
+  timerMode: false,
+  timerSec: 15,
+  questionCount: 10,
+  teams: [
+    { name: "Team 1", score: 0, color: "#FF4D8D" },
+    { name: "Team 2", score: 0, color: "#2FE6C9" }
+  ],
+  currentTeam: 0,
+  currentQIndex: 0,
+  questions: [],
+  history: [],
+  timerId: null,
+  timeLeft: 0,
+  selectedStory: null,
+  wildcardActive: null,
+  wildcardDrawn: false,
+  userOrder: [],
+  verbsState: null
+};
+
+const triviaBankData = buildTriviaBank();
+const easyBankData = buildEasyBank();
+
+/* ================= NAVEGACIÓN Y CONFIGURACIÓN ================= */
+
+function returnToMenu() {
+  if (state.timerId) clearInterval(state.timerId);
+  state.screen = 'SETUP';
+  render();
+}
+
+function initGame() {
+  let pool = [];
+  
+  if (state.categories.includes('A')) pool.push(...triviaBankData.map(q => ({...q, cat:'A', catName:'Time Twist Trivia'})));
+  if (state.categories.includes('B')) pool.push(...easyBankData.map(q => ({...q, cat:'B', catName:'Easy Dominican Trivia'})));
+  if (state.categories.includes('C')) {
+    let verbQs = verbTriples.map(vt => ({
+      cat:'C', catName:'Irregular Verbs',
+      type: 'VERB',
+      verb: vt[0], past: vt[1], pp: vt[2]
+    }));
+    pool.push(...verbQs);
+  }
+  if (state.categories.includes('D')) {
+    let orderQs = orderingBank.map(o => ({
+      cat:'D', catName:'Sentence Builder',
+      type: 'ORDER',
+      full: o.a, hint: o.h
+    }));
+    pool.push(...orderQs);
+  }
+  if (state.categories.includes('E')) {
+    let storyQs = storyBank.map(s => ({
+      cat:'E', catName:'Story Order',
+      type: 'STORY',
+      story: s
+    }));
+    pool.push(...storyQs);
+  }
+
+  // Shuffle pool
+  pool = pool.sort(() => Math.random() - 0.5);
+  state.questions = pool.slice(0, state.questionCount);
+  
+  state.currentQIndex = 0;
+  state.teams.forEach(t => t.score = 0);
+  
+  // Si el modo tiempo está activo, el equipo inicial se escoge al azar
+  if(state.timerMode) {
+    state.currentTeam = Math.floor(Math.random() * state.teams.length);
+  } else {
+    state.currentTeam = 0;
+  }
+
+  state.history = [];
+  state.screen = 'GAME';
+  setupQuestion();
+}
+
+function setupQuestion() {
+  if (state.timerId) clearInterval(state.timerId);
+  state.wildcardDrawn = false;
+  state.wildcardActive = null;
+  
+  const q = state.questions[state.currentQIndex];
+  if (!q) {
+    state.screen = 'GAMEOVER';
+    render();
+    return;
+  }
+
+  if (q.type === 'STORY') {
+    // Asignar letras A, B, C, D a las cartas barajadas
+    const letters = ['A','B','C','D'];
+    let shuffled = [...q.story.cards].sort(() => Math.random() - 0.5);
+    state.selectedStory = {
+      cards: shuffled.map((c, i) => ({ ...c, letter: letters[i] })),
+      slots: [null, null, null, null]
+    };
+  } else if (q.type === 'ORDER') {
+    let words = q.full.split(' ').sort(() => Math.random() - 0.5);
+    state.userOrder = [];
+    q.wordPool = words;
+  } else if (q.type === 'VERB') {
+    state.verbsState = { past: '', pp: '' };
+  }
+
+  if (state.timerMode) {
+    state.timeLeft = state.timerSec;
+    state.timerId = setInterval(() => {
+      state.timeLeft--;
+      if (state.timeLeft <= 0) {
+        clearInterval(state.timerId);
+        handleAnswer(false, "Time's up!");
+      } else {
+        renderTimerOnly();
+      }
+    }, 1000);
+  }
+  render();
+}
+
+function handleAnswer(isCorrect, customExplain = null) {
+  if (state.timerId) clearInterval(state.timerId);
+  
+  const q = state.questions[state.currentQIndex];
+  const team = state.teams[state.currentTeam];
+  
+  let pts = isCorrect ? 100 : 0;
+  if (state.wildcardActive === 'double') {
+    pts = isCorrect ? 200 : -100;
+  }
+
+  team.score += pts;
+  if(team.score < 0) team.score = 0;
+
+  state.history.push({
+    team: team.name,
+    q: q.p || q.catName,
+    correct: isCorrect,
+    pts: pts
+  });
+
+  const root = document.getElementById('screen-root');
+  const card = root.querySelector('.card');
+  if (card) {
+    const stamp = document.createElement('div');
+    stamp.className = `stamp ${isCorrect ? 'ok' : 'no'}`;
+    stamp.innerText = isCorrect ? 'CORRECT!' : 'WRONG!';
+    card.appendChild(stamp);
+    if (!isCorrect) card.classList.add('shake');
+  }
+
+  setTimeout(() => {
+    state.currentQIndex++;
+    state.currentTeam = (state.currentTeam + 1) % state.teams.length;
+    setupQuestion();
+  }, 1800);
+}
+
+/* ================= RENDERIZADO ================= */
+
+function renderTimerOnly() {
+  const bar = document.querySelector('.timer-bar');
+  const txt = document.querySelector('.timer-text');
+  if (bar && txt) {
+    const pct = (state.timeLeft / state.timerSec) * 100;
+    bar.style.width = pct + '%';
+    txt.innerText = `${state.timeLeft}s remaining`;
+  }
+}
+
+function drawWildcard() {
+  // Las comodines no están disponibles durante las primeras 4 preguntas
+  if (state.currentQIndex < 4) return;
+
+  // Filtrar wildcard de robos si no hay rivales con puntos
+  let availableCards = WILDCARDS.filter(w => {
+    if (w.type === 'steal') {
+      let otherTeams = state.teams.filter((_, idx) => idx !== state.currentTeam);
+      return otherTeams.some(t => t.score > 0);
+    }
+    return true;
+  });
+
+  const card = availableCards[Math.floor(Math.random() * availableCards.length)];
+  state.wildcardActive = card.type;
+  state.wildcardDrawn = true;
+
+  if (card.type === 'steal') {
+    let otherTeams = state.teams.filter((_, idx) => idx !== state.currentTeam);
+    otherTeams.sort((a,b) => b.score - a.score);
+    if (otherTeams[0] && otherTeams[0].score >= 100) {
+      otherTeams[0].score -= 100;
+      state.teams[state.currentTeam].score += 100;
+    }
+  } else if (card.type === 'pass') {
+    state.teams[state.currentTeam].score += 50;
+    setTimeout(() => {
+      state.currentQIndex++;
+      state.currentTeam = (state.currentTeam + 1) % state.teams.length;
+      setupQuestion();
+    }, 1500);
+  }
+  render();
+}
+
+function render() {
+  const root = document.getElementById('screen-root');
+  
+  if (state.screen === 'SETUP') {
+    root.innerHTML = `
+      <div class="card">
+        <h2 class="headline">Game Setup</h2>
+        <p class="lede">Customize your grammar trivia challenge for your class!</p>
+
+        <div class="section-title"><span class="num">1</span> Choose Game Categories</div>
+        <div class="cat-grid">
+          <div class="cat-card ${state.categories.includes('A')?'on A':''}" onclick="toggleCat('A')">
+            <span class="emoji">⏱</span> Time Twist Trivia <small>Grammar (Simple/Cont/Perf)</small>
+          </div>
+          <div class="cat-card ${state.categories.includes('B')?'on B':''}" onclick="toggleCat('B')">
+            <span class="emoji">🇩🇴</span> Easy DR Trivia <small>Culture & General Knowledge</small>
+          </div>
+          <div class="cat-card ${state.categories.includes('C')?'on C':''}" onclick="toggleCat('C')">
+            <span class="emoji">⚡</span> Irregular Verbs <small>Past & Past Participle</small>
+          </div>
+          <div class="cat-card ${state.categories.includes('D')?'on D':''}" onclick="toggleCat('D')">
+            <span class="emoji">🧩</span> Sentence Builder <small>Unscramble grammar</small>
+          </div>
+          <div class="cat-card ${state.categories.includes('E')?'on E':''}" onclick="toggleCat('E')">
+            <span class="emoji">📖</span> Story Order <small>Sequential Cards</small>
+          </div>
+        </div>
+
+        <div class="section-title"><span class="num">2</span> Game Rules & Options</div>
+        <div class="toggle-grid">
+          <div class="toggle-card ${state.wildcards?'on':''}" onclick="state.wildcards=!state.wildcards; render();">
+            <span class="emoji">🃏</span> Wildcards: <strong>${state.wildcards?'ENABLED':'DISABLED'}</strong>
+          </div>
+          <div class="toggle-card ${state.timerMode?'on':''}" onclick="state.timerMode=!state.timerMode; render();">
+            <span class="emoji">⚡</span> Timer Mode: <strong>${state.timerMode?'ON':'OFF'}</strong>
+          </div>
+        </div>
+
+        ${state.timerMode ? `
+          <div class="stepper-row" style="margin-top:10px;">
+            <span class="stepper-label">Timer Seconds per Turn:</span>
+            <div class="stepper">
+              <button onclick="changeTimer(-5)">-</button>
+              <span class="val">${state.timerSec}s</span>
+              <button onclick="changeTimer(5)">+</button>
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="stepper-row" style="margin-top:10px;">
+          <span class="stepper-label">Total Questions:</span>
+          <div class="stepper">
+            <button onclick="changeQCount(-5)">-</button>
+            <span class="val">${state.questionCount}</span>
+            <button onclick="changeQCount(5)">+</button>
+          </div>
+        </div>
+
+        <div class="section-title"><span class="num">3</span> Teams Setup</div>
+        <div id="teams-list">
+          ${state.teams.map((t, idx) => `
+            <div class="team-row">
+              <div class="team-dot" style="background:${t.color}"></div>
+              <input type="text" class="team-name-input" value="${t.name}" onchange="state.teams[${idx}].name=this.value">
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn-secondary" style="margin-top:6px;" onclick="addTeam()">+ Add Team</button>
+
+        <div class="rules-block" style="margin-top:20px; background:#fff; padding:12px; border-radius:12px; border:2px dashed var(--ink-soft);">
+          <h3>📜 How to Play & Rules:</h3>
+          <p>• <strong>Time Mode:</strong> Teams starting order is chosen completely <em>at random</em> when time mode is enabled.</p>
+          <p>• <strong>Wildcards:</strong> Available only starting from <strong>Question 5</strong> onwards.</p>
+          <p>• <strong>Steal Points Card:</strong> Only appears if another rival team currently has more than 0 points.</p>
+          <p>• Select options using letter buttons (A, B, C, D).</p>
+        </div>
+
+        <div style="margin-top:24px; text-align:center;">
+          <button class="btn-primary" onclick="initGame()">START GAME SHOW 🚀</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (state.screen === 'GAME') {
+    const q = state.questions[state.currentQIndex];
+    const team = state.teams[state.currentTeam];
+
+    root.innerHTML = `
+      <div class="top-nav">
+        <button class="btn-home" onclick="returnToMenu()">🏠 Main Menu</button>
+        <div class="badge ${q.cat}">${q.catName}</div>
+      </div>
+
+      <div class="status-bar">
+        <div class="progress-pill">Q ${state.currentQIndex + 1} / ${state.questions.length}</div>
+        <div class="scores">
+          ${state.teams.map((t, i) => `
+            <div class="score-chip ${i === state.currentTeam ? 'turn' : ''}">
+              ${t.name}: ${t.score} pts
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      ${state.timerMode ? `
+        <div class="timer-wrap">
+          <div class="timer-track"><div class="timer-bar" style="width:${(state.timeLeft/state.timerSec)*100}%"></div></div>
+          <div class="timer-text">${state.timeLeft}s remaining</div>
+        </div>
+      ` : ''}
+
+      <div class="card">
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--violet); margin-bottom:6px;">
+          👉 TURN: <span style="color:${team.color}">${team.name}</span>
+        </div>
+
+        ${state.wildcards && !state.wildcardDrawn && state.currentQIndex >= 4 ? `
+          <button class="btn-secondary" style="margin-bottom:12px;" onclick="drawWildcard()">🃏 Draw Wildcard!</button>
+        ` : ''}
+
+        ${state.wildcardDrawn ? `
+          <div style="background:var(--yellow); padding:8px 12px; border-radius:10px; font-weight:700; font-size:12px; margin-bottom:12px;">
+            Wildcard Active: ${state.wildcardActive.toUpperCase()}!
+          </div>
+        ` : ''}
+
+        ${renderQuestionContent(q)}
+      </div>
+    `;
+  }
+
+  if (state.screen === 'GAMEOVER') {
+    let sorted = [...state.teams].sort((a,b) => b.score - a.score);
+    root.innerHTML = `
+      <div class="card" style="text-align:center;">
+        <div class="winner-banner">🎉 GAME OVER 🎉</div>
+        <h2>Winner: ${sorted[0].name} (${sorted[0].score} pts)!</h2>
+
+        <table class="summary-table">
+          <thead>
+            <tr><th>Rank</th><th>Team</th><th>Score</th></tr>
+          </thead>
+          <tbody>
+            ${sorted.map((t, idx) => `
+              <tr><td>#${idx+1}</td><td>${t.name}</td><td>${t.score} pts</td></tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <button class="btn-primary" onclick="returnToMenu()">Play Again / Main Menu</button>
+      </div>
+    `;
+  }
+}
+
+function renderQuestionContent(q) {
+  const optionLetters = ['A', 'B', 'C', 'D'];
+
+  if (q.type === 'STORY') {
+    const s = state.selectedStory;
+    return `
+      <h2 class="headline">${q.story.title}</h2>
+      <p class="lede">Select images in correct order (1 to 4) using the card letters (A, B, C, D):</p>
+      
+      <div class="story-slots">
+        ${s.slots.map((slot, idx) => `
+          <div class="story-slot ${slot ? 'filled' : ''}">
+            Slot ${idx + 1}
+            ${slot ? `<div style="font-size:20px;">${slot.e}</div><div style="font-size:10px;">${slot.t}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="story-pool">
+        ${s.cards.map((card) => {
+          const isPlaced = s.slots.some(sl => sl && sl.letter === card.letter);
+          return `
+            <div class="story-card ${isPlaced ? 'placed' : ''}" onclick="placeStoryCard('${card.letter}')">
+              <span class="letter-tag">${card.letter}</span>
+              <span class="emoji">${card.e}</span>
+              <div class="txt">${card.t}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <div style="text-align:right;">
+        <button class="btn-secondary" onclick="resetStorySlots()">Reset</button>
+        <button class="btn-primary" onclick="checkStoryOrder()">Submit Order</button>
+      </div>
+    `;
+  }
+
+  if (q.type === 'ORDER') {
+    return `
+      <h2 class="headline">Sentence Builder</h2>
+      <p class="lede">Hint: ${q.hint}</p>
+      
+      <div class="sentence-box">
+        ${state.userOrder.length === 0 ? `<span class="placeholder">Click words below to build the sentence...</span>` : ''}
+        ${state.userOrder.map((w, idx) => `
+          <div class="chip placed" onclick="removeWord(${idx})">${w}</div>
+        `).join('')}
+      </div>
+
+      <div class="chip-pool">
+        ${q.wordPool.map((w, idx) => `
+          <div class="chip" onclick="addWord('${w.replace(/'/g, "\\'")}')">${w}</div>
+        `).join('')}
+      </div>
+
+      <button class="btn-primary" onclick="checkSentenceOrder()">Check Sentence</button>
+    `;
+  }
+
+  if (q.type === 'VERB') {
+    return `
+      <h2 class="headline">Complete the Irregular Verb</h2>
+      <p class="lede">Base Form: <strong>${q.verb.toUpperCase()}</strong></p>
+
+      <div class="options">
+        <p>Choose Past Simple & Past Participle:</p>
+        <button class="option" onclick="handleAnswer(true)">
+          <span class="option-prefix">A</span> ${q.past} / ${q.pp}
+        </button>
+        <button class="option" onclick="handleAnswer(false)">
+          <span class="option-prefix">B</span> ${q.verb}ed / ${q.verb}ed
+        </button>
+        <button class="option" onclick="handleAnswer(false)">
+          <span class="option-prefix">C</span> ${q.past} / ${q.verb}ing
+        </button>
+      </div>
+    `;
+  }
+
+  // STANDARD MCQ
+  return `
+    <h2 class="headline">${q.p}</h2>
+    <div class="options">
+      ${q.o.map((opt, idx) => `
+        <button class="option" onclick="handleAnswer(${idx === q.c})">
+          <span class="option-prefix">${optionLetters[idx]}</span>
+          ${opt}
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* ================= INTERACCIONES Y LÓGICA ================= */
+
+function toggleCat(cat) {
+  if (state.categories.includes(cat)) {
+    if (state.categories.length > 1) {
+      state.categories = state.categories.filter(c => c !== cat);
+    }
+  } else {
+    state.categories.push(cat);
+  }
+  render();
+}
+
+function changeTimer(val) {
+  state.timerSec = Math.max(5, state.timerSec + val);
+  render();
+}
+
+function changeQCount(val) {
+  state.questionCount = Math.max(5, state.questionCount + val);
+  render();
+}
+
+function addTeam() {
+  if (state.teams.length < 5) {
+    const colors = ["#FF8A3D", "#5CD6FF", "#FFD23F"];
+    state.teams.push({
+      name: `Team ${state.teams.length + 1}`,
+      score: 0,
+      color: colors[state.teams.length % colors.length]
+    });
+    render();
+  }
+}
+
+function placeStoryCard(letter) {
+  const s = state.selectedStory;
+  const card = s.cards.find(c => c.letter === letter);
+  const emptyIdx = s.slots.findIndex(x => x === null);
+  if (emptyIdx !== -1 && !s.slots.some(sl => sl && sl.letter === letter)) {
+    s.slots[emptyIdx] = card;
+    render();
+  }
+}
+
+function resetStorySlots() {
+  state.selectedStory.slots = [null, null, null, null];
+  render();
+}
+
+function checkStoryOrder() {
+  const s = state.selectedStory;
+  if (s.slots.includes(null)) return;
+  
+  let isCorrect = true;
+  for (let i = 0; i < 4; i++) {
+    if (!s.slots[i].t.startsWith((i + 1).toString())) {
+      isCorrect = false;
+      break;
+    }
+  }
+  handleAnswer(isCorrect);
+}
+
+function addWord(word) {
+  state.userOrder.push(word);
+  render();
+}
+
+function removeWord(idx) {
+  state.userOrder.splice(idx, 1);
+  render();
+}
+
+function checkSentenceOrder() {
+  const q = state.questions[state.currentQIndex];
+  const userStr = state.userOrder.join(' ');
+  handleAnswer(userStr === q.full);
+}
+
+// INICIALIZACIÓN DE LA APLICACIÓN
+render();
+</script>
+</body>
+</html>
